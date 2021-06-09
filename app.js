@@ -65,6 +65,20 @@ app.put("/posts/:id", (req,res)=>{
   else res.send("ERR");
 });
 
+app.delete("/posts/:id", (req,res)=>{
+  const id = req.params.id;
+  let found = false;
+  for (let i=0; i<posts.length; i++){
+    if (posts[i].id.toString()===id){
+      posts.splice(i,1);
+      found = true;
+      break;
+    }
+  }
+  if (found) res.send("OK");
+  else res.send("ERR");
+});
+
 app.get("/posts/:id/comments", (req,res)=>{
   const id = req.params.id;
   const postComments = comments.filter(elem=>elem.postId.toString() === id);
