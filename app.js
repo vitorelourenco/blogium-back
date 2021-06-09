@@ -29,7 +29,7 @@ const comments = [
 ];
 
 let nextPostId = 2;
-let nextCommentID = 3;
+let nextCommentId = 3;
 
 app.get("/posts", (req,res)=>{
   res.send(posts);
@@ -60,6 +60,12 @@ app.get("/posts/:id/comments", (req,res)=>{
 
 app.post("/posts/:id/comments", (req,res)=>{
   const id = req.params.id;
+  const comment = req.body;
+  comment.postId = parseInt(id);
+  comment.id = nextCommentId;
+  nextCommentId++;
+  comments.push(comment);
+  res.send("OK");
 });
 
 app.listen(4000);
