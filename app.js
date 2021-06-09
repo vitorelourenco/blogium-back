@@ -14,8 +14,22 @@ const posts = [{
   commentCount: 2
 }];
 
-const comments = [];
-let nextID = 2;
+const comments = [
+  {      
+    id: 1,
+    postId: 1,
+    author: 'João',
+    content: 'Muito bom esse post! Tá de parabéns'
+  },{
+    id: 2,
+    postId: 1,
+    author: 'Maria',
+    content: 'Como faz pra dar palmas?'
+  }
+];
+
+let nextPostId = 2;
+let nextCommentID = 3;
 
 app.get("/posts", (req,res)=>{
   res.send(posts);
@@ -25,8 +39,8 @@ app.post("/posts", (req,res)=>{
   const post = req.body;
   post.contentPreview = post.title.substring(0,20);
   post.commentCount = 0;
-  post.id = nextID;
-  nextID++;
+  post.id = nextPostId;
+  nextPostId++;
   posts.push(post);
   res.send("OK");
 });
@@ -40,6 +54,8 @@ app.get("/posts/:id", (req,res)=>{
 
 app.get("/posts/:id/comments", (req,res)=>{
   const id = req.params.id;
+  const postComments = comments.filter(elem=>elem.postId.toString() === id);
+  res.send(postComments);
 });
 
 app.post("/posts/:id/comments", (req,res)=>{
