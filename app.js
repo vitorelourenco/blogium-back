@@ -37,7 +37,7 @@ app.get("/posts", (req,res)=>{
 
 app.post("/posts", (req,res)=>{
   const post = req.body;
-  post.contentPreview = post.title.substring(0,20);
+  post.contentPreview = post.content.substring(0,20);
   post.commentCount = 0;
   post.id = nextPostId;
   nextPostId++;
@@ -49,7 +49,20 @@ app.get("/posts/:id", (req,res)=>{
   const id = req.params.id;
   const post = posts.find(elem => elem.id.toString() === id);
   if (post) res.send(post);
-  else res.send({});
+  else res.send("ERR");
+});
+
+app.put("/posts/:id", (req,res)=>{
+  const id = req.params.id;
+  const post = posts.find(elem => elem.id.toString() === id);
+  if (post) {
+    post.coverUrl = req.body.coverUrl;
+    post.content = req.body.content;
+    post.title = req.body.title;
+    post.contentPreview = post.title.substring(0,20);
+    res.send("OK");
+  }
+  else res.send("ERR");
 });
 
 app.get("/posts/:id/comments", (req,res)=>{
@@ -67,5 +80,7 @@ app.post("/posts/:id/comments", (req,res)=>{
   comments.push(comment);
   res.send("OK");
 });
+
+
 
 app.listen(4000);
