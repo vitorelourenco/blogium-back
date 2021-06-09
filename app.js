@@ -23,6 +23,8 @@ app.get("/posts", (req,res)=>{
 
 app.post("/posts", (req,res)=>{
   const post = req.body;
+  post.contentPreview = post.title.substring(0,20);
+  post.commentCount = 0;
   post.id = nextID;
   nextID++;
   posts.push(post);
