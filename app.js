@@ -1,35 +1,26 @@
 import express from 'express';
 import cors from 'cors';
+import { existsSync, writeFileSync, readFileSync } from 'fs';
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const posts = [{
-  id: 1,
-  title: 'Hello World',
-  coverUrl: 'https://miro.medium.com/max/1024/1*OohqW5DGh9CQS4hLY5FXzA.png',
-  contentPreview: 'Esta é a estrutura de um post esperado pelo front-end',
-  content: 'Este é o conteúdo do post, o que realmente vai aparecer na página do post...',
-  commentCount: 2
-}];
+if (!existsSync('./posts.json')){
+  writeFileSync('./posts.json', JSON.stringify({posts:[], nextPostId:1}));
+}
+const postStorage = JSON.parse(readFileSync('./posts.json'));
 
-const comments = [
-  {      
-    id: 1,
-    postId: 1,
-    author: 'João',
-    content: 'Muito bom esse post! Tá de parabéns'
-  },{
-    id: 2,
-    postId: 1,
-    author: 'Maria',
-    content: 'Como faz pra dar palmas?'
-  }
-];
+if (!existsSync('./comments.json')){
+  writeFileSync('./comments.json', JSON.stringify({comments:[],nextCommentId:1}));
+}
+const commentStorage = JSON.parse(readFileSync('./comments.json'));
 
-let nextPostId = 2;
-let nextCommentId = 3;
+const posts = postStorage.posts;
+let nextPostId = postStorage.nextPostId;
+
+const comments = commentStorage.comments;
+let nextCommentId = commentStorage.nextCommentId;
 
 app.get("/posts", (req,res)=>{
   res.send(posts);
@@ -37,7 +28,7 @@ app.get("/posts", (req,res)=>{
 
 app.post("/posts", (req,res)=>{
   const post = req.body;
-  post.contentPreview = post.content.substring(0,20);
+  post.contentPreview = post.content.substring(0,50);
   post.commentCount = 0;
   post.id = nextPostId;
   nextPostId++;
@@ -59,7 +50,7 @@ app.put("/posts/:id", (req,res)=>{
     post.coverUrl = req.body.coverUrl;
     post.content = req.body.content;
     post.title = req.body.title;
-    post.contentPreview = post.title.substring(0,20);
+    post.contentPreview = post.title.substring(0,50);
     res.send("OK");
   }
   else res.send("ERR");
@@ -75,7 +66,9 @@ app.delete("/posts/:id", (req,res)=>{
       break;
     }
   }
-  if (found) res.send("OK");
+  if (found) {
+    res.send("OK");
+  }
   else res.send("ERR");
 });
 
@@ -95,6 +88,9 @@ app.post("/posts/:id/comments", (req,res)=>{
   res.send("OK");
 });
 
-
-
 app.listen(4000);
+
+process.on('exit', ()=>{
+  writeFileSync('./posts.json', JSON.stringify({posts, nextPostId}));
+  writeFileSync('./comments.json', JSON.stringify({comments,nextCommentId}));
+})
